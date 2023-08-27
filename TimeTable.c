@@ -3,130 +3,201 @@
 #include <string.h>
 #include <time.h>
 
-#define MAX_COURSES 10
-#define MAX_DAYS 5 // Adjusted for a 5-day school week (Monday to Friday)
-#define MAX_SLOTS_PER_DAY 6 // Adjusted for 6 time slots per day
+#define MAX_SUBJECTS 10
+#define MAX_DAYS 5
+#define MAX_SLOTS 6
+#define SUBJECT_NAME_LENGTH 50
 
 typedef struct {
-    char name[50];
-    int duration;
-} Course;
+    char name[SUBJECT_NAME_LENGTH];
+    int slotsPerDay[MAX_DAYS];
+} Subject;
 
-typedef struct {
-    char name[50]; // Course name added to timetable entry
-    char day[10];
-    int slot;
-} TimetableEntry;
+void displayTimetable(Subject timetable[MAX_DAYS][MAX_SLOTS], int days, int slots) {
+    printf("\n--- Timetable ---\n");
+    printf("%-15s", "Day/Slot");
+    for (int slot = 1; slot <= slots; ++slot) {
+        printf("| Slot %d", slot);
+    }
+    printf("\n--------------------------------------\n");
+    for (int day = 0; day < days; ++day) {
+        printf("%-15s", day == 0 ? "Monday" : day == 1 ? "Tuesday" : day == 2 ? "Wednesday" : day == 3 ? "Thursday" : "Friday");
+        for (int slot = 0; slot < slots; ++slot) {
+            printf("| %-6s", timetable[day][slot].name);
+        }
+        printf("\n");
+    }
+    printf("--------------------------------------\n");
+}
 
-// Function prototypes
-void generateTimetable(Course courses[], int numCourses);
-int isSlotAvailable(TimetableEntry timetable[][MAX_SLOTS_PER_DAY], int day, int slot, int duration, const char *courseName);
-void addToTimetable(TimetableEntry timetable[][MAX_SLOTS_PER_DAY], Course course, int day, int slot);
-void shuffleCourses(Course courses[], int numCourses);
-void displayTimetable(TimetableEntry timetable[][MAX_SLOTS_PER_DAY]);
+int isSubjectScheduledTodayInArray(const char scheduledSubjects[MAX_SUBJECTS][MAX_DAYS][SUBJECT_NAME_LENGTH], int day, const char *subjectName, int numSubjects) {
+    for (int subjectIndex = 0; subjectIndex < numSubjects; ++subjectIndex) {
+        if (strcmp(scheduledSubjects[subjectIndex][day], subjectName) == 0) {
+            return 1;
+        }
+    }
+    return 0;
+}
 
 int main() {
-    Course courses[MAX_COURSES];
-    int numCourses;
+    Subject timetable[MAX_DAYS][MAX_SLOTS];
+    int days, slots;
+    int choice;
 
-    printf("Enter the number of courses: ");
-    scanf("%d", &numCourses);
-    getchar();
+    printf("Enter the number of days in a week: ");
+    scanf("%d", &days);
 
-    printf("Enter course details:\n");
-    for (int i = 0; i < numCourses; i++) {
-        printf("Course %d name: ", i + 1);
-        fgets(courses[i].name, sizeof(courses[i].name), stdin);
-        courses[i].name[strlen(courses[i].name) - 1] = '\0'; // Remove newline character
+    printf("Enter the number of slots per day: ");
+    scanf("%d", &slots);
 
-        printf("Course %d duration (in time slots): ", i + 1);
-        scanf("%d", &courses[i].duration);
-        getchar(); // Consume newline character
+    if (days <= 0 || slots <= 0) {
+        printf("Invalid input for days/slots.\n");
+        return 1;
     }
 
-    generateTimetable(courses, numCourses);
+    srand(time(NULL));
+
+    for (int day = 0; day < days; ++day) {
+        for (int slot = 0; slot < slots; ++slot) {
+            strcpy(timetable[day][slot].name, "Free");
+            timetable[day][slot].slotsPerDay[day] = 0;
+        }
+    }
+
+    do {
+        printf("\n--- Menu ---\n");
+        printf("1. Add subjects and schedule\n");
+        printf("2. Display timetable\n");
+        printf("3. Change subject slot\n");
+        printf("4. Delete subject\n");
+        printf("5. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1: // Add subjects and schedule
+    printf("Enter the number of subjects: ");
+    int numSubjects;
+    scanf("%d", &numSubjects);
+
+    if (numSubjects > MAX_SUBJECTS) {
+        printf("Maximum subjects allowed: %d\n", MAX_SUBJECTS);
+        break;
+    }
+
+    char scheduledSubjects[MAX_DAYS][MAX_SUBJECTS][SUBJECT_NAME_LENGTH] = {0}; // To track subjects scheduled on each day
+    int scheduledCounts[MAX_DAYS][MAX_SUBJECTS] = {0}; // To track the count of subjects scheduled on each day
+
+    for (int i = 0; i < numSubjects; ++i) {
+        printf("Enter subject name: ");
+        char newSubjectName[SUBJECT_NAME_LENGTH];
+        scanf("%s", newSubjectName);
+
+        printf("Enter total number of slots for subject %s: ", newSubjectName);
+        int totalSlots;
+        scanf("%d", &totalSlots);
+
+        int availableSlots = days * slots;
+
+        if (totalSlots <= availableSlots) {
+            int slotsAdded = 0;
+
+            // Shuffle the order of days and slots
+            int shuffledDays[MAX_DAYS];
+            for (int i = 0; i < days; ++i) {
+                shuffledDays[i] = i;
+            }
+            srand(time(NULL));
+            for (int i = days - 1; i > 0; --i) {
+                int j = rand() % (i + 1);
+                int temp = shuffledDays[i];
+                shuffledDays[i] = shuffledDays[j];
+                shuffledDays[j] = temp;
+            }
+
+            int shuffledSlots[MAX_SLOTS];
+            for (int i = 0; i < slots; ++i) {
+                shuffledSlots[i] = i;
+            }
+            for (int i = slots - 1; i > 0; --i) {
+                int j = rand() % (i + 1);
+                int temp = shuffledSlots[i];
+                shuffledSlots[i] = shuffledSlots[j];
+                shuffledSlots[j] = temp;
+            }
+
+            for (int dayIdx = 0; dayIdx < days && slotsAdded < totalSlots; ++dayIdx) {
+                int day = shuffledDays[dayIdx];
+
+                // Ensure the subject appears at least once a day
+                int slotIdx = rand() % slots;
+                int slot = shuffledSlots[slotIdx];
+
+                if (scheduledCounts[day][i] < 2 && !isSubjectScheduledTodayInArray(scheduledSubjects, day, newSubjectName, numSubjects)) {
+                    if (strcmp(timetable[day][slot].name, "Free") == 0) {
+                        strcpy(timetable[day][slot].name, newSubjectName);
+                        timetable[day][slot].slotsPerDay[day]++;
+                        strcpy(scheduledSubjects[day][slotsAdded], newSubjectName);
+                        scheduledCounts[day][i]++;
+                        slotsAdded++;
+                    }
+                }
+            }
+
+            printf("Subject %s added to %d random slots.\n", newSubjectName, slotsAdded);
+        } else {
+            printf("Not enough available slots to add subject %s.\n", newSubjectName);
+        }
+    }
+    break;
+
+
+
+            case 2: // Display timetable
+                displayTimetable(timetable, days, slots);
+                break;
+
+            case 3: // Change subject slot
+                printf("Enter day and slot to change (e.g., 2 3): ");
+                int changeDay, changeSlot;
+                scanf("%d %d", &changeDay, &changeSlot);
+
+                if (changeDay >= 1 && changeDay <= days && changeSlot >= 1 && changeSlot <= slots) {
+                    printf("Enter new subject name: ");
+                    char updatedSubjectName[SUBJECT_NAME_LENGTH];
+                    scanf("%s", updatedSubjectName);
+
+                    strcpy(timetable[changeDay - 1][changeSlot - 1].name, updatedSubjectName);
+                    printf("Subject updated in Day %d Slot %d.\n", changeDay, changeSlot);
+                } else {
+                    printf("Invalid day or slot.\n");
+                }
+                break;
+
+            case 4: // Delete subject
+                printf("Enter day and slot to delete (e.g., 2 3): ");
+                int deleteDay, deleteSlot;
+                scanf("%d %d", &deleteDay, &deleteSlot);
+
+                if (deleteDay >= 1 && deleteDay <= days && deleteSlot >= 1 && deleteSlot <= slots) {
+                    strcpy(timetable[deleteDay - 1][deleteSlot - 1].name, "Free");
+                    timetable[deleteDay - 1][deleteSlot - 1].slotsPerDay[deleteDay - 1]--;
+                    printf("Subject deleted from Day %d Slot %d.\n", deleteDay, deleteSlot);
+                } else {
+                    printf("Invalid day or slot.\n");
+                }
+                break;
+
+            case 5: // Exit
+                printf("Exiting program.\n");
+                break;
+
+            default:
+                printf("Invalid choice. Please select a valid option.\n");
+        }
+
+    } while (choice != 5);
 
     return 0;
 }
 
-void generateTimetable(Course courses[], int numCourses) {
-    TimetableEntry timetable[MAX_DAYS][MAX_SLOTS_PER_DAY] = {0}; // Initialize all elements to 0
-
-    // Shuffle the order of courses randomly
-    shuffleCourses(courses, numCourses);
-
-    int day = 0;
-    int slot = 0;
-    for (int i = 0; i < numCourses; i++) {
-        while (!isSlotAvailable(timetable, day, slot, courses[i].duration, courses[i].name)) {
-            slot++;
-            if (slot >= MAX_SLOTS_PER_DAY) {
-                slot = 0;
-                day++;
-                if (day >= MAX_DAYS) {
-                    printf("Timetable cannot be generated due to constraints.\n");
-                    return;
-                }
-            }
-        }
-        addToTimetable(timetable, courses[i], day, slot);
-        slot += courses[i].duration;
-        if (slot >= MAX_SLOTS_PER_DAY) {
-            slot = 0;
-            day++;
-            if (day >= MAX_DAYS) {
-                printf("Timetable cannot be generated due to constraints.\n");
-                return;
-            }
-        }
-    }
-
-    displayTimetable(timetable);
-}
-
-int isSlotAvailable(TimetableEntry timetable[][MAX_SLOTS_PER_DAY], int day, int slot, int duration, const char *courseName) {
-    for (int i = 0; i < duration; i++) {
-        if (timetable[day][slot + i].name[0] != '\0' || strcmp(timetable[day][slot + i].name, courseName) == 0) {
-            return 0;
-        }
-    }
-    return 1;
-}
-
-void addToTimetable(TimetableEntry timetable[][MAX_SLOTS_PER_DAY], Course course, int day, int slot) {
-    for (int i = 0; i < course.duration; i++) {
-        strcpy(timetable[day][slot + i].name, course.name);
-        strcpy(timetable[day][slot + i].day, "Day");
-        timetable[day][slot + i].slot = slot + i;
-    }
-}
-
-void shuffleCourses(Course courses[], int numCourses) {
-    srand(time(NULL)); // Seed the random number generator
-    for (int i = numCourses - 1; i > 0; i--) {
-        int j = rand() % (i + 1);
-        Course temp = courses[i];
-        courses[i] = courses[j];
-        courses[j] = temp;
-    }
-}
-
-void displayTimetable(TimetableEntry timetable[][MAX_SLOTS_PER_DAY]) {
-    printf("\nGenerated Timetable:\n");
-
-    printf("+------------+------+------+------+------+------+\n");
-    printf("| Time Slots | Mon  | Tue  | Wed  | Thu  | Fri  |\n");
-    printf("+------------+------+------+------+------+------+\n");
-
-    for (int s = 0; s < MAX_SLOTS_PER_DAY; s++) {
-        printf("| Slot %2d   |", s);
-        for (int d = 0; d < MAX_DAYS; d++) {
-            if (timetable[d][s].name[0] != '\0') {
-                printf(" %-4s |", timetable[d][s].name);
-            } else {
-                printf("      |");
-            }
-        }
-        printf("\n+------------+------+------+------+------+------+\n");
-    }
-}
