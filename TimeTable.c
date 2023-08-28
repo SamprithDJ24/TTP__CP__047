@@ -44,7 +44,7 @@ int main() {
     int days, slots;
     int choice;
 
-    printf("Enter the number of days in a week: ");
+    printf("Enter the number of working days in a week: ");
     scanf("%d", &days);
 
     printf("Enter the number of slots per day: ");
