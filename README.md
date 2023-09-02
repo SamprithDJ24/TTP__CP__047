@@ -15,7 +15,7 @@
 <h2>Features</h2>
 
 <ul>
-    <li>Add subjects and schedule them randomly.</li>
+    <li>Add subjects and schedule them systematically.</li>
     <li>Display the timetable in a tabular format.</li>
     <li>Change the slot of a subject on a specific day.</li>
     <li>Delete a subject from a specific slot on a specific day.</li>
@@ -37,7 +37,7 @@
 <ul>
     <li><strong>Add subjects and schedule (Option 1)</strong>:
         <ul>
-            <li>Allows you to add subjects and schedule them randomly on the timetable.</li>
+            <li>Allows you to add subjects and schedule them systematically on the timetable.</li>
             <li>Ensures that each subject appears at least once a day.</li>
             <li>Subjects are randomly assigned to available slots.</li>
         </ul>
