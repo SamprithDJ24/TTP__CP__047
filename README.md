@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
 </head>
 <body>
 
-<h1>Student TImeTable Generator</h1>
+<h1>Student TimeTable Generator</h1>
 
 <h2>Description</h2>
 
@@ -32,6 +31,7 @@
 </ul>
 
 
+
 <h2>Menu Options</h2>
 
 <ul>
@@ -42,7 +42,32 @@
             <li>Subjects are randomly assigned to available slots.</li>
         </ul>
     </li>
+<li><strong>Display timetable (Option 2)</strong>:
+        <ul>
+            <li>Displays the current timetable in a tabular format.</li>
+        </ul>
+    </li>
 
+<li><strong>Change subject slot (Option 3)</strong>:
+        <ul>
+            <li>Allows you to change the slot of a subject on a specific day.</li>
+            <li>Enter the day and slot to change and provide the new subject name.</li>
+        </ul>
+    </li>
+
+ <li><strong>Delete subject (Option 4)</strong>:
+        <ul>
+            <li>Allows you to delete a subject from a specific slot on a specific day.</li>
+            <li>Enter the day and slot to delete the subject from.</li>
+        </ul>
+    </li>
+
+ <li><strong>Exit (Option 5)</strong>:
+        <ul>
+            <li>Exits the program.</li>
+        </ul>
+    </li>
+    
 </ul>
 
 <h2>Selected Functions</h2>
