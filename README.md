@@ -91,13 +91,15 @@
     </li>
 </ul>
 
-<h2>License</h2>
+<h2>Selected Functions</h2>
 
-<p>This project is licensed under the MIT License - see the <a href="LICENSE">LICENSE</a> file for details.</p>
+<h3>displayTimetable Function</h3>
 
-<h2>Author</h2>
+<p>The <code>displayTimetable</code> function is used to display the current timetable in a tabular format. It takes the <code>timetable</code> array, the number of <code>days</code>, and the number of <code>slots</code> as arguments.</p>
 
-<p>[Your Name]</p>
+<h3>isSubjectScheduledTodayInArray Function</h3>
+
+<p>The <code>isSubjectScheduledTodayInArray</code> function checks if a subject is scheduled on a specific day. It takes an array of scheduled subjects, the day index, the subject name, and the number of subjects as arguments.</p>
 
 </body>
 </html>
