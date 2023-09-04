@@ -15,7 +15,7 @@
 <h2>Features</h2>
 
 <ul>
-    <li>Add subjects and schedule them systematically.</li>
+    <li>Add subjects and schedule time-table systematically.</li>
     <li>Display the timetable in a tabular format.</li>
     <li>Change the slot of a subject on a specific day.</li>
     <li>Delete a subject from a specific slot on a specific day.</li>
